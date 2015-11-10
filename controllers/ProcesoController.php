@@ -4,10 +4,14 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Proceso;
+use app\models\Campo;
+use app\models\Model;
+use app\models\Opcion;
 use app\models\ProcesoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 /**
  * ProcesoController implements the CRUD actions for Proceso model.
@@ -60,15 +64,58 @@ class ProcesoController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Proceso();
+        $modelProceso = new Proceso;
+        $modelsCampo = [new Campo];
+        if ($modelProceso->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            $modelsCampo = Model::createMultiple(Campo::classname());
+            Model::loadMultiple($modelsCampo, Yii::$app->request->post());
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsCampo),
+                    ActiveForm::validate($modelProceso)
+                );
+            }
+            
+            // validate all models
+            $valid = $modelProceso->validate();
+            $valid = Model::validateMultiple($modelsCampo) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelProceso->save(false)) {
+                        foreach ($modelsCampo as $modelCampo) {
+                            $modelCampo->proceso_id = $modelProceso->id;
+                            $campo = Opcion::find()->where(['tipo_id'=>$modelCampo->tipo_id])->one();
+                            if($campo)
+                                $modelCampo->ca_multiopc='s';
+                            else
+                                $modelCampo->ca_multiopc='n';
+                            
+                            if (! ($flag = $modelCampo->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $modelProceso->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
         }
+
+        return $this->render('create', [
+            'modelProceso' => $modelProceso,
+            'modelsCampo' => (empty($modelsCampo)) ? [new Campo] : $modelsCampo
+        ]);
     }
 
     /**
@@ -77,7 +124,7 @@ class ProcesoController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    /*public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
@@ -88,6 +135,61 @@ class ProcesoController extends Controller
                 'model' => $model,
             ]);
         }
+    }*/
+    public function actionUpdate($id)
+    {
+        $modelProceso = $this->findModel($id);
+        $modelsCampo = $modelProceso->campos;
+
+        if ($modelProceso->load(Yii::$app->request->post())) {
+
+            $oldIDs = ArrayHelper::map($modelsCampo, 'id', 'id');
+            $modelsCampo = Model::createMultiple(Campo::classname(), $modelsCampo);
+            Model::loadMultiple($modelsCampo, Yii::$app->request->post());
+            $deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsCampo, 'id', 'id')));
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsCampo),
+                    ActiveForm::validate($modelProceso)
+                );
+            }
+
+            // validate all models
+            $valid = $modelProceso->validate();
+            $valid = Model::validateMultiple($modelsCampo) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelProceso->save(false)) {
+                        if (! empty($deletedIDs)) {
+                            Address::deleteAll(['id' => $deletedIDs]);
+                        }
+                        foreach ($modelsCampo as $modelCampo) {
+                            $modelCampo->proceso_id = $modelProceso->id;
+                            if (! ($flag = $modelCampo->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $modelProceso->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
+        }
+
+        return $this->render('update', [
+            'modelProceso' => $modelProceso,
+            'modelsCampo' => (empty($modelsCampo)) ? [new Address] : $modelsCampo
+        ]);
     }
 
     /**

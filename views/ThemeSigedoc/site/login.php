@@ -24,7 +24,7 @@ $fieldOptions2 = [
         <a href="#"><b>Sigedoc</b>Software</a>
     </div>
     <!-- /.login-logo -->
-    <div class="login-box-body">
+    <div class="login-box-body cuerpo">
         <p class="login-box-msg">Iniciar Sesión</p>
 
         <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>

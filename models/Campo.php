@@ -37,7 +37,7 @@ class Campo extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tipo_id', 'proceso_id', 'ca_nombre', 'ca_obligatorio', 'ca_multiopc'], 'required'],
+            [['tipo_id', 'ca_nombre', 'ca_obligatorio'], 'required'],
             [['tipo_id', 'proceso_id'], 'integer'],
             [['ca_descripcion'], 'string'],
             [['ca_nombre'], 'string', 'max' => 50],

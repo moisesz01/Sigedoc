@@ -29,7 +29,7 @@ class Opcion extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tipo_id', 'op_nombre'], 'required'],
+            [['op_nombre'], 'required'],
             [['tipo_id'], 'integer'],
             [['op_nombre'], 'string', 'max' => 25]
         ];

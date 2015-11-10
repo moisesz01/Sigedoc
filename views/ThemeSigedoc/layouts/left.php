@@ -30,35 +30,55 @@
             [
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
-                    ['label' => 'Menu Sigedoc', 'options' => ['class' => 'header']],
-                    ['label' => 'Gii', 'icon' => 'fa fa-file-code-o', 'url' => ['/gii']],
-                    ['label' => 'Debug', 'icon' => 'fa fa-dashboard', 'url' => ['/debug']],
-                    ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
+
                     [
-                        'label' => 'Same tools',
+                        'label' => 'Proceso',
                         'icon' => 'fa fa-share',
                         'url' => '#',
                         'items' => [
-                            ['label' => 'ADmin', 'icon' => 'fa fa-file-code-o', 'url' => ['/actividad/create'],],
-                            ['label' => 'Gii', 'icon' => 'fa fa-file-code-o', 'url' => ['/gii'],],
-                            ['label' => 'Debug', 'icon' => 'fa fa-dashboard', 'url' => ['/debug'],],
-                            [
-                                'label' => 'Level One',
-                                'icon' => 'fa fa-circle-o',
-                                'url' => '#',
-                                'items' => [
-                                    ['label' => 'Level Two', 'icon' => 'fa fa-circle-o', 'url' => '#',],
-                                    [
-                                        'label' => 'Level Two',
-                                        'icon' => 'fa fa-circle-o',
-                                        'url' => '#',
-                                        'items' => [
-                                            ['label' => 'Level Three', 'icon' => 'fa fa-circle-o', 'url' => '#',],
-                                            ['label' => 'Level Three', 'icon' => 'fa fa-circle-o', 'url' => '#',],
-                                        ],
-                                    ],
-                                ],
-                            ],
+                            ['label' => 'Administrar Procesos', 'icon' => 'fa fa-file-code-o', 'url' => ['/proceso/index'],'visible' => (Yii::$app->user->can('Administrar Proceso'))],
+                            ['label' => 'Crear Proceso', 'icon' => 'fa fa-file-code-o', 'url' => ['/proceso/create'],'visible' => (Yii::$app->user->can('Administrar Proceso'))],
+                           
+                        ],
+                    ],
+                    [
+                        'label' => 'Flujo',
+                        'icon' => 'fa fa-share',
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Administrar Flujo', 'icon' => 'fa fa-file-code-o', 'url' => ['/flujo/index'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                            ['label' => 'Crear Flujo', 'icon' => 'fa fa-file-code-o', 'url' => ['/flujo/create'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                           
+                        ],
+                    ],
+                    [
+                        'label' => 'Actividad',
+                        'icon' => 'fa fa-share',
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Administrar Actividades', 'icon' => 'fa fa-file-code-o', 'url' => ['/actividad/index'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                            ['label' => 'Crear Actividad', 'icon' => 'fa fa-file-code-o', 'url' => ['/actividad/create'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                           
+                        ],
+                    ],
+                    [
+                        'label' => 'Flujo del Documento',
+                        'icon' => 'fa fa-share',
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Administrar Flujo Proceso', 'icon' => 'fa fa-file-code-o', 'url' => ['/proceso-flujo/index'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                            ['label' => 'Crear Flujo Proceso ', 'icon' => 'fa fa-file-code-o', 'url' => ['/proceso-flujo/create'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                           
+                        ],
+                    ],
+                    [
+                        'label' => 'Tipo de Dato',
+                        'icon' => 'fa fa-share',
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Administrar tipo de Dato', 'icon' => 'fa fa-file-code-o', 'url' => ['/tipo/index'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                            ['label' => 'Crear tipo de Dato ', 'icon' => 'fa fa-file-code-o', 'url' => ['/tipo/create'],'visible' => (Yii::$app->user->can('Administrar Flujo'))],
+                           
                         ],
                     ],
                 ],

@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Tipo;
+use app\models\Model;
+use app\models\Opcion;
 use app\models\TipoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -60,15 +62,52 @@ class TipoController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Tipo();
+        $modelTipo = new Tipo;
+        $modelsOpcion = [new Opcion];
+        if ($modelTipo->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            $modelsOpcion = Model::createMultiple(Opcion::classname());
+            Model::loadMultiple($modelsOpcion, Yii::$app->request->post());
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsOpcion),
+                    ActiveForm::validate($modelTipo)
+                );
+            }
+
+            // validate all models
+            $valid = $modelTipo->validate();
+            $valid = Model::validateMultiple($modelsOpcion) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelTipo->save(false)) {
+                        foreach ($modelsOpcion as $modelOpcion) {
+                            $modelOpcion->tipo_id = $modelTipo->id;
+                            if (! ($flag = $modelOpcion->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $modelTipo->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
         }
+
+        return $this->render('create', [
+            'modelTipo' => $modelTipo,
+            'modelsOpcion' => (empty($modelsOpcion)) ? [new Address] : $modelsOpcion
+        ]);
     }
 
     /**
@@ -79,15 +118,58 @@ class TipoController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $modelTipo = $this->findModel($id);
+        $modelsOpcion = [new Opcion];
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($modelTipo->load(Yii::$app->request->post())) {
+
+            $oldIDs = ArrayHelper::map($modelsOpcion, 'id', 'id');
+            $modelsOpcion = Model::createMultiple(Opcion::classname(), $modelsOpcion);
+            Model::loadMultiple($modelsOpcion, Yii::$app->request->post());
+            $deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsOpcion, 'id', 'id')));
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsOpcion),
+                    ActiveForm::validate($modelTipo)
+                );
+            }
+
+            // validate all models
+            $valid = $modelTipo->validate();
+            $valid = Model::validateMultiple($modelsOpcion) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $modelTipo->save(false)) {
+                        if (! empty($deletedIDs)) {
+                            Address::deleteAll(['id' => $deletedIDs]);
+                        }
+                        foreach ($modelsOpcion as $modelOpcion) {
+                            $modelOpcion->tipo_id = $modelTipo->id;
+                            if (! ($flag = $modelOpcion->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $modelTipo->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
         }
+
+        return $this->render('update', [
+            'modelTipo' => $modelTipo,
+            'modelsOpcion' => (empty($modelsOpcion)) ? [new Opcion] : $modelsOpcion
+        ]);
     }
 
     /**
