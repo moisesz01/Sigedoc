@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\ProcesoFlujo;
+use app\models\Requerimiento;
 use app\models\ProcesoFlujoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -61,12 +62,15 @@ class ProcesoFlujoController extends Controller
     public function actionCreate()
     {
         $model = new ProcesoFlujo();
+        
+        $modelsRequerimiento = [new Requerimiento];
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'modelsRequerimiento' => (empty($modelsRequerimiento)) ? [new Campo] : $modelsRequerimiento
             ]);
         }
     }
