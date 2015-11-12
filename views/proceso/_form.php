@@ -4,6 +4,7 @@ use yii\widgets\ActiveForm;
 use wbraganca\dynamicform\DynamicFormWidget;
 use yii\helpers\ArrayHelper;
 use app\models\Tipo;
+use yii\helpers\Json;
 ?>
 
 <div class="customer-form">
@@ -28,7 +29,7 @@ use app\models\Tipo;
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <?= $form->field($modelProceso, 'pr_directorio')->textarea(['rows' => 1]) ?>
+            <?= $form->field($modelProceso, 'pr_directorio')->textarea(['rows' => 1,'onblur'=>"verificarDirectorio()"]) ?>
         </div>
     </div>
 
@@ -100,3 +101,25 @@ use app\models\Tipo;
     <?php ActiveForm::end(); ?>
 
 </div>
+<script type="text/javascript">
+    
+    function verificarDirectorio() {
+        $.ajax({
+           url: '<?php echo Yii::$app->request->baseUrl. '/proceso/directory' ?>',
+           type: 'post',
+           data: {directorio: $("#proceso-pr_directorio").val()},
+           //data: {search: "hola"},
+           success: function (data) {
+                if (data.isDirectory==1) {
+                    alert("Directorio existente");
+                    $('#proceso-pr_directorio').val('');
+                    $('#proceso-pr_directorio').focus();
+                }
+              
+           }
+        });
+        
+    }
+
+</script>
+

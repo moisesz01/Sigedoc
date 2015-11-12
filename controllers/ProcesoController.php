@@ -12,6 +12,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\BaseFileHelper;
 
 /**
  * ProcesoController implements the CRUD actions for Proceso model.
@@ -62,6 +63,23 @@ class ProcesoController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+    public function actionDirectory(){
+        if (Yii::$app->request->isAjax) {
+            $data = Yii::$app->request->post();
+            $directorio= explode(":", $data['directorio']);
+            $directorio= $directorio[0];
+            if (!file_exists($directorio)) 
+                $isDirectory=0;
+            else
+                $isDirectory=1;
+            
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            return [
+                'isDirectory' => $isDirectory,
+            ];
+          }
+    }
     public function actionCreate()
     {
         $modelProceso = new Proceso;
@@ -104,6 +122,12 @@ class ProcesoController extends Controller
                     }
                     if ($flag) {
                         $transaction->commit();
+
+                        if (!file_exists($modelProceso->pr_directorio)) {
+                           mkdir($modelProceso->pr_directorio, 0777, true);
+                        }
+
+                        $archivo=\yii\helpers\FileHelper::createDirectory("prueba", 777, true);
                         return $this->redirect(['view', 'id' => $modelProceso->id]);
                     }
                 } catch (Exception $e) {
