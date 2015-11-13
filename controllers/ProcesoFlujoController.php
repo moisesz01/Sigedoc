@@ -6,6 +6,7 @@ use Yii;
 use app\models\ProcesoFlujo;
 use app\models\Requerimiento;
 use app\models\ProcesoFlujoSearch;
+use app\models\Model;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -61,18 +62,52 @@ class ProcesoFlujoController extends Controller
      */
     public function actionCreate()
     {
-        $model = new ProcesoFlujo();
-        
+        $model = new ProcesoFlujo;
         $modelsRequerimiento = [new Requerimiento];
+        if ($model->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-                'modelsRequerimiento' => (empty($modelsRequerimiento)) ? [new Campo] : $modelsRequerimiento
-            ]);
+            $modelsRequerimiento = Model::createMultiple(Requerimiento::classname());
+            Model::loadMultiple($modelsRequerimiento, Yii::$app->request->post());
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsRequerimiento),
+                    ActiveForm::validate($model)
+                );
+            }
+            
+            // validate all models
+            $valid = $model->validate();
+            $valid = Model::validateMultiple($modelsRequerimiento) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $model->save(false)) {
+                        foreach ($modelsRequerimiento as $modelRequerimiento) {
+                            $modelRequerimiento->proceso_flujo_id = $model->id;
+                            if (! ($flag = $modelRequerimiento->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();                
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
         }
+
+        return $this->render('create', [
+            'model' => $model,
+            'modelsRequerimiento' => (empty($modelsRequerimiento)) ? [new Campo] : $modelsRequerimiento
+        ]);
     }
 
     /**
@@ -84,14 +119,57 @@ class ProcesoFlujoController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $modelsRequerimiento = $model->requerimientos;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            $oldIDs = ArrayHelper::map($modelsRequerimiento, 'id', 'id');
+            $modelsRequerimiento = Model::createMultiple(Campo::classname(), $modelsRequerimiento);
+            Model::loadMultiple($modelsRequerimiento, Yii::$app->request->post());
+            $deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsRequerimiento, 'id', 'id')));
+
+            // ajax validation
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ArrayHelper::merge(
+                    ActiveForm::validateMultiple($modelsRequerimiento),
+                    ActiveForm::validate($model)
+                );
+            }
+
+            // validate all models
+            $valid = $model->validate();
+            $valid = Model::validateMultiple($modelsRequerimiento) && $valid;
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $model->save(false)) {
+                        if (! empty($deletedIDs)) {
+                            Requerimiento::deleteAll(['id' => $deletedIDs]);
+                        }
+                        foreach ($modelsRequerimiento as $modelRequerimiento) {
+                            $modelRequerimiento->proceso_flujo_id = $model->id;
+                            if (! ($flag = $modelRequerimiento->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
         }
+
+        return $this->render('update', [
+            'model' => $model,
+            'modelsRequerimiento' => (empty($modelsRequerimiento)) ? [new Requerimiento] : $modelsRequerimiento
+        ]);
     }
 
     /**

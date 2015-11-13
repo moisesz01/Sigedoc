@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\Tipo;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Proceso */
@@ -12,11 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="proceso-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Datos del proceso:</h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Borrar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -36,5 +37,30 @@ $this->params['breadcrumbs'][] = $this->title;
             'pr_directorio:ntext',
         ],
     ]) ?>
+
+
+    <h2>Campos del Proceso</h2>
+
+    <table class="table table-striped table-bordered" style="text-align:center;">
+        <tr>
+          <td><strong>Nombre del Campo</strong></td>
+          <td><strong>Tipo de Dato</strong></td>
+          
+        </tr>
+         <?php foreach ($modelsCampo as $value):?>
+            <tr>
+              <td><?=$value['ca_nombre']?></td>
+              <td>
+                  <?php
+
+                    $tipo = Tipo::find()->where(['id'=>$value['tipo_id']])->one();
+                    $tipo = $tipo['ti_tipo'];
+                    echo $tipo;
+                  ?>
+              </td>
+              
+            </tr>
+        <?php endforeach;?>
+    </table>
 
 </div>

@@ -18,8 +18,9 @@ class ProcesoFlujoSearch extends ProcesoFlujo
     public function rules()
     {
         return [
-            [['id', 'usuario_idusuario', 'actividad_idactividad', 'proceso_id', 'flujo_idflujo'], 'integer'],
+            [['id'], 'integer'],
             [['pf_orden'], 'number'],
+            [['usuario_idusuario', 'actividad_idactividad', 'proceso_id', 'flujo_idflujo'],'safe'],
         ];
     }
 
@@ -54,15 +55,23 @@ class ProcesoFlujoSearch extends ProcesoFlujo
             // $query->where('0=1');
             return $dataProvider;
         }
+        $query->joinWith(['proceso']);
+        $query->joinWith('actividadIdactividad');
+        $query->joinWith('flujoIdflujo');
+        $query->joinWith('usuarioIdusuario');
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'usuario_idusuario' => $this->usuario_idusuario,
+            /*'usuario_idusuario' => $this->usuario_idusuario,
             'actividad_idactividad' => $this->actividad_idactividad,
             'proceso_id' => $this->proceso_id,
-            'flujo_idflujo' => $this->flujo_idflujo,
+            'flujo_idflujo' => $this->flujo_idflujo,*/
             'pf_orden' => $this->pf_orden,
         ]);
+        $query->andFilterWhere(['like','proceso.pr_nombre',$this->proceso_id])
+        ->andFilterWhere(['like','flujo.fl_nombre',$this->flujo_idflujo])
+        ->andFilterWhere(['like','user.username',$this->usuario_idusuario])
+        ->andFilterWhere(['like','actividad.ac_nombre',$this->actividad_idactividad]);
 
         return $dataProvider;
     }

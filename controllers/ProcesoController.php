@@ -53,8 +53,11 @@ class ProcesoController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $modelsCampo = $model->campos;
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'modelsCampo' => $modelsCampo,
         ]);
     }
 
@@ -126,8 +129,6 @@ class ProcesoController extends Controller
                         if (!file_exists($modelProceso->pr_directorio)) {
                            mkdir($modelProceso->pr_directorio, 0777, true);
                         }
-
-                        $archivo=\yii\helpers\FileHelper::createDirectory("prueba", 777, true);
                         return $this->redirect(['view', 'id' => $modelProceso->id]);
                     }
                 } catch (Exception $e) {
@@ -190,7 +191,7 @@ class ProcesoController extends Controller
                 try {
                     if ($flag = $modelProceso->save(false)) {
                         if (! empty($deletedIDs)) {
-                            Address::deleteAll(['id' => $deletedIDs]);
+                            Campos::deleteAll(['id' => $deletedIDs]);
                         }
                         foreach ($modelsCampo as $modelCampo) {
                             $modelCampo->proceso_id = $modelProceso->id;
@@ -212,7 +213,7 @@ class ProcesoController extends Controller
 
         return $this->render('update', [
             'modelProceso' => $modelProceso,
-            'modelsCampo' => (empty($modelsCampo)) ? [new Address] : $modelsCampo
+            'modelsCampo' => (empty($modelsCampo)) ? [new Campo] : $modelsCampo
         ]);
     }
 

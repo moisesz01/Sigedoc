@@ -32,7 +32,7 @@ class Requerimiento extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['proceso_flujo_id', 're_nombre'], 'required'],
+            [['re_nombre'], 'required'],
             [['proceso_flujo_id'], 'integer'],
             [['re_descripcion'], 'string'],
             [['re_nombre'], 'string', 'max' => 50],
@@ -48,9 +48,9 @@ class Requerimiento extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'proceso_flujo_id' => 'Proceso Flujo ID',
-            're_nombre' => 'Re Nombre',
-            're_descripcion' => 'Re Descripcion',
-            're_estado' => 'Re Estado',
+            're_nombre' => 'Nombre',
+            're_descripcion' => 'Descripción',
+            're_estado' => 'Estado',
         ];
     }
 

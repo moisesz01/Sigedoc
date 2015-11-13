@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProcesoFlujoSearch */
@@ -18,22 +19,33 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Create Proceso Flujo', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
+    <?php Pjax::begin();?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'usuario_idusuario',
-            'actividad_idactividad',
-            'proceso_id',
-            'flujo_idflujo',
+            [
+                'attribute' => 'proceso_id',
+                'value' => 'proceso.pr_nombre',
+            ],
+            [
+                'attribute' => 'usuario_idusuario',
+                'value' => 'usuarioIdusuario.username',
+            ],
+            [
+                'attribute' => 'actividad_idactividad',
+                'value' => 'actividadIdactividad.ac_nombre',
+            ],
+            [
+                'attribute' => 'flujo_idflujo',
+                'value' => 'flujoIdflujo.fl_nombre',
+            ],
+            
             // 'pf_orden',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
+    <?php Pjax::end(); ?>
 </div>
