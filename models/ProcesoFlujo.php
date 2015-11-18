@@ -51,11 +51,12 @@ class ProcesoFlujo extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'usuario_idusuario' => 'Usuario Idusuario',
-            'actividad_idactividad' => 'Actividad Idactividad',
-            'proceso_id' => 'Proceso ID',
-            'flujo_idflujo' => 'Flujo Idflujo',
-            'pf_orden' => 'Pf Orden',
+            
+            'actividad_idactividad' => 'Actividad',
+            'proceso_id' => 'Proceso',
+            'flujo_idflujo' => 'Flujo',
+            'usuario_idusuario' => 'Responsable',
+            'pf_orden' => 'Orden',
         ];
     }
 

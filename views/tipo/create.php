@@ -6,17 +6,17 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Tipo */
 
-$this->title = 'Create Tipo';
+$this->title = '';
 $this->params['breadcrumbs'][] = ['label' => 'Tipos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = 'Crear Tipo de Dato';
 ?>
 <div class="tipo-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Crear Tipo de Dato</h1>
 
     <?= $this->render('_form', [
-        'modelTipo' => $modelTipo,
-        'modelsOpcion' => (empty($modelsOpcion)) ? [new Address] : $modelsOpcion
+        'model' => $model,
+        'modelsOpcion' => (empty($modelsOpcion)) ? [new Opcion] : $modelsOpcion
     ]) ?>
 
 </div>

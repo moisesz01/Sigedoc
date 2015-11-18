@@ -6,13 +6,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\actividad */
 
-$this->title = 'Create Actividad';
+$this->title = '';
 $this->params['breadcrumbs'][] = ['label' => 'Actividads', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = 'Crear Actividad';
 ?>
 <div class="actividad-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Crear Actividad</h1>
 
     <?= $this->render('_form', [
         'model' => $model,

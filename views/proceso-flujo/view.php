@@ -15,8 +15,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('<span class="glyphicon glyphicon-pencil"></span> Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-trash"></span> Borrar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -36,5 +36,26 @@ $this->params['breadcrumbs'][] = $this->title;
             'pf_orden',
         ],
     ]) ?>
+    <?php if($requerimientos):?>
+        <h2>Requerimientos</h2>
+
+        <table class="table table-striped table-bordered" style="text-align:center;">
+            <tr>
+              <td><strong>Nombre del Requerimiento</strong></td>
+              <td><strong>Descripción del Requerimiento</strong></td>
+              
+            </tr>
+             <?php foreach ($requerimientos as $requerimiento):?>
+                <tr>
+                  <td><?=$requerimiento['re_nombre']?></td>
+                  <td><?=$requerimiento['re_descripcion']?></td>
+                  
+                </tr>
+            <?php endforeach;?>
+        </table> 
+
+    <?php endif; ?>
+    
+<?= Html::a(' <span class="glyphicon glyphicon-circle-arrow-left"> </span>  Volver', ['proceso-flujo/index'] , ['class'=>'btn btn-success', 'style'=>'margin-top:20px;']) ?>
 
 </div>

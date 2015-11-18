@@ -16,8 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1>Datos del proceso:</h1>
 
     <p>
-        <?= Html::a('Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Borrar', ['delete', 'id' => $model->id], [
+        <?= Html::a('<span class="glyphicon glyphicon-pencil"></span> Actualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-trash"></span> Borrar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -62,5 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </tr>
         <?php endforeach;?>
     </table>
+
+    <?= Html::a(' <span class="glyphicon glyphicon-circle-arrow-left"> </span>  Volver', ['proceso-flujo/index'] , ['class'=>'btn btn-success', 'style'=>'margin-top:20px;']) ?>
 
 </div>

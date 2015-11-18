@@ -7,9 +7,11 @@ use app\models\ProcesoFlujo;
 use app\models\Requerimiento;
 use app\models\ProcesoFlujoSearch;
 use app\models\Model;
+use app\models\UsuarioProceso;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 /**
  * ProcesoFlujoController implements the CRUD actions for ProcesoFlujo model.
@@ -50,8 +52,10 @@ class ProcesoFlujoController extends Controller
      */
     public function actionView($id)
     {
+        $requerimientos = Requerimiento::find()->where(['proceso_flujo_id'=>$id])->all();
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'requerimientos'=>$requerimientos,
         ]);
     }
 
@@ -95,8 +99,13 @@ class ProcesoFlujoController extends Controller
                         }
                     }
                     if ($flag) {
-                        $transaction->commit();                
+                        $transaction->commit();  
+                        $UserProceso = new UsuarioProceso();  
+                        $UserProceso->usuario_idusuario = $model->usuario_idusuario;
+                        $UserProceso->proceso_id = $model->proceso_id;
+                        $UserProceso->save();
                         return $this->redirect(['view', 'id' => $model->id]);
+
                     }
                 } catch (Exception $e) {
                     $transaction->rollBack();
@@ -124,7 +133,7 @@ class ProcesoFlujoController extends Controller
         if ($model->load(Yii::$app->request->post())) {
 
             $oldIDs = ArrayHelper::map($modelsRequerimiento, 'id', 'id');
-            $modelsRequerimiento = Model::createMultiple(Campo::classname(), $modelsRequerimiento);
+            $modelsRequerimiento = Model::createMultiple(Requerimiento::classname(), $modelsRequerimiento);
             Model::loadMultiple($modelsRequerimiento, Yii::$app->request->post());
             $deletedIDs = array_diff($oldIDs, array_filter(ArrayHelper::map($modelsRequerimiento, 'id', 'id')));
 
@@ -180,9 +189,15 @@ class ProcesoFlujoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model=$this->findModel($id);
+        
+        Requerimiento::deleteAll('proceso_flujo_id = :id', [':id' => $model->id]);
 
-        return $this->redirect(['index']);
+        $model->delete();
+        Yii::$app->session->setFlash('success',Yii::t('app', 'Borrado Exitoso'));      
+        return $this->redirect(['index']); 
+
+      
     }
 
     /**

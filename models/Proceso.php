@@ -51,11 +51,11 @@ class Proceso extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'pr_referencia' => 'Pr Referencia',
-            'pr_nombre' => 'Pr Nombre',
-            'pr_descripcion' => 'Pr Descripcion',
-            'pr_aprobacion' => 'Pr Aprobacion',
-            'pr_directorio' => 'Pr Directorio',
+            'pr_referencia' => 'Referencia',
+            'pr_nombre' => 'Nombre',
+            'pr_descripcion' => 'Descripción',
+            'pr_aprobacion' => 'Aprobación',
+            'pr_directorio' => 'Directorio',
         ];
     }
 

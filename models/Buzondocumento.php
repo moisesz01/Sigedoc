@@ -50,12 +50,12 @@ class Buzondocumento extends \yii\db\ActiveRecord
     {
         return [
             'idbuzondocumento' => 'Idbuzondocumento',
-            'bd_fechaentrada' => 'Bd Fechaentrada',
-            'bd_fechasalida' => 'Bd Fechasalida',
-            'bd_estado' => 'Bd Estado',
-            'bd_userorigen' => 'Bd Userorigen',
-            'bd_userdestino' => 'Bd Userdestino',
-            'documento_iddocumento' => 'Documento Iddocumento',
+            'bd_fechaentrada' => 'Fecha de entrada',
+            'bd_fechasalida' => 'Fecha de salida',
+            'bd_estado' => 'Estado',
+            'bd_userorigen' => 'Usuario origen',
+            'bd_userdestino' => 'usuario destino',
+            'documento_iddocumento' => 'Identificador del Documento',
         ];
     }
 

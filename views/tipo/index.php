@@ -7,16 +7,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\TipoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Tipos';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = '';
+$this->params['breadcrumbs'][] = 'Tipo de Dato';
 ?>
 <div class="tipo-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Tipo de Dato</h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Tipo', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Crear Tipo de Dato', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

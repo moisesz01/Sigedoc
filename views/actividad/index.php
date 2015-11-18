@@ -7,16 +7,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\actividadSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Actividads';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = '';
+$this->params['breadcrumbs'][] = 'Actividades';
 ?>
 <div class="actividad-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Actividades</h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Actividad', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Crear Actividad', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'idactividad',
+            
             'ac_nombre',
             'ac_descripcion:ntext',
 

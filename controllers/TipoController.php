@@ -10,6 +10,7 @@ use app\models\TipoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 /**
  * TipoController implements the CRUD actions for Tipo model.
@@ -50,8 +51,10 @@ class TipoController extends Controller
      */
     public function actionView($id)
     {
+        $opciones = Opcion::find()->where(['tipo_id'=>$id])->all();
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'opciones'=>$opciones,
         ]);
     }
 
@@ -62,9 +65,9 @@ class TipoController extends Controller
      */
     public function actionCreate()
     {
-        $modelTipo = new Tipo;
+        $model = new Tipo;
         $modelsOpcion = [new Opcion];
-        if ($modelTipo->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
 
             $modelsOpcion = Model::createMultiple(Opcion::classname());
             Model::loadMultiple($modelsOpcion, Yii::$app->request->post());
@@ -74,20 +77,20 @@ class TipoController extends Controller
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 return ArrayHelper::merge(
                     ActiveForm::validateMultiple($modelsOpcion),
-                    ActiveForm::validate($modelTipo)
+                    ActiveForm::validate($model)
                 );
             }
 
             // validate all models
-            $valid = $modelTipo->validate();
+            $valid = $model->validate();
             $valid = Model::validateMultiple($modelsOpcion) && $valid;
 
             if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    if ($flag = $modelTipo->save(false)) {
+                    if ($flag = $model->save(false)) {
                         foreach ($modelsOpcion as $modelOpcion) {
-                            $modelOpcion->tipo_id = $modelTipo->id;
+                            $modelOpcion->tipo_id = $model->id;
                             if (! ($flag = $modelOpcion->save(false))) {
                                 $transaction->rollBack();
                                 break;
@@ -96,7 +99,7 @@ class TipoController extends Controller
                     }
                     if ($flag) {
                         $transaction->commit();
-                        return $this->redirect(['view', 'id' => $modelTipo->id]);
+                        return $this->redirect(['view', 'id' => $model->id]);
                     }
                 } catch (Exception $e) {
                     $transaction->rollBack();
@@ -105,7 +108,7 @@ class TipoController extends Controller
         }
 
         return $this->render('create', [
-            'modelTipo' => $modelTipo,
+            'model' => $model,
             'modelsOpcion' => (empty($modelsOpcion)) ? [new Address] : $modelsOpcion
         ]);
     }
@@ -118,10 +121,10 @@ class TipoController extends Controller
      */
     public function actionUpdate($id)
     {
-        $modelTipo = $this->findModel($id);
-        $modelsOpcion = [new Opcion];
+        $model = $this->findModel($id);
+        $modelsOpcion = $model->opcions;
 
-        if ($modelTipo->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
 
             $oldIDs = ArrayHelper::map($modelsOpcion, 'id', 'id');
             $modelsOpcion = Model::createMultiple(Opcion::classname(), $modelsOpcion);
@@ -133,23 +136,23 @@ class TipoController extends Controller
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 return ArrayHelper::merge(
                     ActiveForm::validateMultiple($modelsOpcion),
-                    ActiveForm::validate($modelTipo)
+                    ActiveForm::validate($model)
                 );
             }
 
             // validate all models
-            $valid = $modelTipo->validate();
+            $valid = $model->validate();
             $valid = Model::validateMultiple($modelsOpcion) && $valid;
 
             if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    if ($flag = $modelTipo->save(false)) {
+                    if ($flag = $model->save(false)) {
                         if (! empty($deletedIDs)) {
-                            Address::deleteAll(['id' => $deletedIDs]);
+                            Opcion::deleteAll(['id' => $deletedIDs]);
                         }
                         foreach ($modelsOpcion as $modelOpcion) {
-                            $modelOpcion->tipo_id = $modelTipo->id;
+                            $modelOpcion->tipo_id = $model->id;
                             if (! ($flag = $modelOpcion->save(false))) {
                                 $transaction->rollBack();
                                 break;
@@ -158,7 +161,8 @@ class TipoController extends Controller
                     }
                     if ($flag) {
                         $transaction->commit();
-                        return $this->redirect(['view', 'id' => $modelTipo->id]);
+                        
+                        return $this->redirect(['view', 'id' => $model->id]);
                     }
                 } catch (Exception $e) {
                     $transaction->rollBack();
@@ -167,10 +171,11 @@ class TipoController extends Controller
         }
 
         return $this->render('update', [
-            'modelTipo' => $modelTipo,
+            'model' => $model,
             'modelsOpcion' => (empty($modelsOpcion)) ? [new Opcion] : $modelsOpcion
         ]);
     }
+
 
     /**
      * Deletes an existing Tipo model.
@@ -180,9 +185,20 @@ class TipoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        try {
+            
+            Opcion::deleteAll('tipo_id = :id', [':id' => $id]);    
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success',Yii::t('app', 'Eliminación exitosa'));
+            return $this->redirect(['index']);
+            
+        } catch (yii\db\IntegrityException $e) {
+            
+            Yii::$app->session->setFlash('danger',Yii::t('app', 'Registro no se puede borrar, hay una relación asociada a el'));
+            return $this->redirect(['index']);
+            
+        }
     }
 
     /**

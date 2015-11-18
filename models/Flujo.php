@@ -41,9 +41,9 @@ class Flujo extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'idflujo' => 'Idflujo',
-            'fl_nombre' => 'Fl Nombre',
-            'fl_descripcion' => 'Fl Descripcion',
+            'idflujo' => 'Identificador',
+            'fl_nombre' => 'Nombre',
+            'fl_descripcion' => 'Descripción',
         ];
     }
 

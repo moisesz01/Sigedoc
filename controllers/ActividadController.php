@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\actividad;
 use app\models\actividadSearch;
+use app\models\ProcesoFlujo;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -98,9 +99,19 @@ class ActividadController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+       try {
+            
+            ProcesoFlujo::deleteAll('actividad_idactividad = :id', [':id' => $id]);   
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success',Yii::t('app', 'Eliminación exitosa'));
+            return $this->redirect(['index']);
+            
+        } catch (yii\db\IntegrityException $e) {
+            
+            Yii::$app->session->setFlash('danger',Yii::t('app', 'Registro no se puede borrar, hay una relación asociada a el'));
+            return $this->redirect(['index']);
+            
+        }
     }
 
     /**

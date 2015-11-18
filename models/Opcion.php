@@ -43,7 +43,7 @@ class Opcion extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'tipo_id' => 'Tipo ID',
-            'op_nombre' => 'Op Nombre',
+            'op_nombre' => 'Nombre',
         ];
     }
 

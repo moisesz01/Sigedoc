@@ -52,13 +52,13 @@ class Campo extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'tipo_id' => 'Tipo ID',
+            'tipo_id' => 'Tipo de Dato',
             'proceso_id' => 'Proceso ID',
-            'ca_nombre' => 'Ca Nombre',
-            'ca_descripcion' => 'Ca Descripcion',
-            'ca_obligatorio' => 'Ca Obligatorio',
+            'ca_nombre' => 'Nombre',
+            'ca_descripcion' => 'Descripción',
+            'ca_obligatorio' => 'Obligatorio',
             'ca_estado' => 'Ca Estado',
-            'ca_multiopc' => 'Ca Multiopc',
+            'ca_multiopc' => 'Multiopcion',
             'ca_clave' => 'Ca Clave',
         ];
     }

@@ -49,11 +49,11 @@ class Documento extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'iddocumento' => 'Iddocumento',
-            'do_referencia' => 'Do Referencia',
-            'proceso_id' => 'Proceso ID',
-            'do_nombre' => 'Do Nombre',
-            'do_descripcion' => 'Do Descripcion',
+            'iddocumento' => 'Identificador del documento',
+            'do_referencia' => 'Referencia',
+            'proceso_id' => 'Proceso',
+            'do_nombre' => 'Nombre',
+            'do_descripcion' => 'Descripción',
         ];
     }
 

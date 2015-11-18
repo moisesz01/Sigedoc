@@ -7,16 +7,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\FlujoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Flujos';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = '';
+$this->params['breadcrumbs'][] = 'Flujos';
 ?>
 <div class="flujo-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Flujos</h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Flujo', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Crear Flujo', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -25,7 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'idflujo',
             'fl_nombre',
             'fl_descripcion:ntext',
 

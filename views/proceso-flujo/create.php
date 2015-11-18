@@ -6,13 +6,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\ProcesoFlujo */
 
-$this->title = 'Create Proceso Flujo';
+$this->title = '';
 $this->params['breadcrumbs'][] = ['label' => 'Proceso Flujos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = 'Crear Proceso Flujo';
 ?>
 <div class="proceso-flujo-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Crear Proceso Flujo</h1>
 
     <?= $this->render('_form', [
         'model' => $model,

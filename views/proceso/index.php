@@ -7,16 +7,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\ProcesoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Procesos';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = '';
+$this->params['breadcrumbs'][] = 'Procesos';
 ?>
 <div class="proceso-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Procesos</h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Proceso', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Crear Proceso', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -25,11 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
             'pr_referencia',
             'pr_nombre',
             'pr_descripcion:ntext',
-            'pr_aprobacion',
+            //'pr_aprobacion',
             // 'pr_directorio:ntext',
 
             ['class' => 'yii\grid\ActionColumn'],

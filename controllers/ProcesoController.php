@@ -7,12 +7,15 @@ use app\models\Proceso;
 use app\models\Campo;
 use app\models\Model;
 use app\models\Opcion;
+use app\models\Requerimiento;
+use app\models\ProcesoFlujo;
 use app\models\ProcesoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseFileHelper;
+use app\models\UsuarioProceso;
 
 /**
  * ProcesoController implements the CRUD actions for Proceso model.
@@ -225,9 +228,26 @@ class ProcesoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        try {
+            $ProcesoFlujo = ProcesoFlujo::find()->where(['proceso_id'=>$id])->all();
+            foreach ($ProcesoFlujo as $item) {
+                Requerimiento::deleteAll('proceso_flujo_id = :id', [':id' => $item['id']]);    
+            }
+            ProcesoFlujo::deleteAll('proceso_id = :id', [':id' => $id]);   
+            Campo::deleteAll('proceso_id = :id', [':id' =>$id]);
+            UsuarioProceso::deleteAll('proceso_id = :id', [':id' => $id]);    
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success',Yii::t('app', 'Eliminación exitosa'));
+            return $this->redirect(['index']);
+            
+        } catch (yii\db\IntegrityException $e) {
+            
+            Yii::$app->session->setFlash('danger',Yii::t('app', 'Registro no se puede borrar, hay una relación asociada a el'));
+            return $this->redirect(['index']);
+            
+        }
+        
     }
 
     /**

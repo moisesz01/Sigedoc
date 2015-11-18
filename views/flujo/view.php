@@ -12,14 +12,14 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="flujo-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Datos del Flujo</h1>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->idflujo], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->idflujo], [
+    <p style="padding-bottom:30px;">
+        <?= Html::a('<span class="glyphicon glyphicon-pencil"></span> Actualizar', ['update', 'id' => $model->idflujo], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('<span class="glyphicon glyphicon-trash"></span> Borrar', ['delete', 'id' => $model->idflujo], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Esta seguro de eliminar este item?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -28,10 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'idflujo',
             'fl_nombre',
             'fl_descripcion:ntext',
         ],
     ]) ?>
+    <?= Html::a(' <span class="glyphicon glyphicon-circle-arrow-left"> </span>  Volver', ['flujo/index'] , ['class'=>'btn btn-success', 'style'=>'margin-top:20px;']) ?>
 
 </div>

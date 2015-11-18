@@ -41,9 +41,9 @@ class Actividad extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'idactividad' => 'Idactividad',
-            'ac_nombre' => 'Ac Nombre',
-            'ac_descripcion' => 'Ac Descripcion',
+            'idactividad' => 'Identificador',
+            'ac_nombre' => 'Nombre',
+            'ac_descripcion' => 'Descripción',
         ];
     }
 
