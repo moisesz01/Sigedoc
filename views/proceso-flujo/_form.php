@@ -80,6 +80,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
         'formFields' => [
             're_nombre',
             're_descripcion',
+            're_obligatorio',
         ],
     ]); ?>
 
@@ -109,11 +110,14 @@ use wbraganca\dynamicform\DynamicFormWidget;
                             }
                         ?>
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-5">
                                 <?= $form->field($modelRequerimiento, "[{$i}]re_nombre")->textInput(['maxlength' => true]) ?>        
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-5">
                                 <?= $form->field($modelRequerimiento, "[{$i}]re_descripcion")->textInput(['maxlength' => true]) ?>        
+                            </div>
+                            <div class="col-sm-2" style="padding-top:30px;">
+                                <?= $form->field($modelRequerimiento, "[{$i}]re_obligatorio")->checkbox() ?> 
                             </div>
                         </div>
                     </div>

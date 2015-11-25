@@ -231,7 +231,11 @@ use app\models\User;
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
-                        <span class="hidden-xs"><?= Yii::$app->user->identity->username;?></span>
+                        <?php if (!Yii::$app->user->isGuest) : ?>
+                            <span class="hidden-xs">                        
+                                <?= Yii::$app->user->identity->username;?>
+                            </span>
+                        <?php endif;?>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
@@ -240,6 +244,7 @@ use app\models\User;
                                  alt="User Image"/>
 
                             <p>
+                                <?php if (!Yii::$app->user->isGuest) : ?>
                                 <?= Yii::$app->user->identity->username;?>
                                 <small> 
                                 Miembro desde:    
@@ -250,6 +255,7 @@ use app\models\User;
                                      echo strftime("%d de %B del %Y",$existe->created_at);     
                                 ?>
                                 </small>
+                            <?php endif;?>
                             </p>
                         </li>
                         <!-- Menu Body -->

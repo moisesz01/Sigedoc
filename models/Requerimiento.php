@@ -1,8 +1,8 @@
 <?php
 
 namespace app\models;
-
 use Yii;
+use app\models\Proceso;
 
 /**
  * This is the model class for table "requerimiento".
@@ -36,7 +36,8 @@ class Requerimiento extends \yii\db\ActiveRecord
             [['proceso_flujo_id'], 'integer'],
             [['re_descripcion'], 'string'],
             [['re_nombre'], 'string', 'max' => 50],
-            [['re_estado'], 'string', 'max' => 25]
+            [['re_estado'], 'string', 'max' => 25],
+            [['re_obligatorio'], 'string', 'max' => 1]
         ];
     }
 
@@ -51,6 +52,7 @@ class Requerimiento extends \yii\db\ActiveRecord
             're_nombre' => 'Nombre',
             're_descripcion' => 'Descripción',
             're_estado' => 'Estado',
+            're_obligatorio' => 'Obligatorio',
         ];
     }
 
@@ -68,5 +70,9 @@ class Requerimiento extends \yii\db\ActiveRecord
     public function getProcesoFlujo()
     {
         return $this->hasOne(ProcesoFlujo::className(), ['id' => 'proceso_flujo_id']);
+    }
+    public function getDirectorio($id){
+        $documento = Proceso::find()->where(['id'=>$id])->one();
+        return $proceso->pr_directorio;
     }
 }

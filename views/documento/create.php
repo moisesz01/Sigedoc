@@ -6,13 +6,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Documento */
 
-$this->title = 'Create Documento';
+$this->title = '';
 $this->params['breadcrumbs'][] = ['label' => 'Documentos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = "Crear Documento";
 ?>
 <div class="documento-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1>Crear Documento</h1>
 
     <?= $this->render('_form', [
         'model' => $model,

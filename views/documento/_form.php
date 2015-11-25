@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
+use yii\jui\DatePicker;
 
 
 /* @var $this yii\web\View */
@@ -12,7 +13,12 @@ use yii\helpers\ArrayHelper;
 
 <div class="documento-form">
 	
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+	    'id' => 'documento-form',
+	    'options' => ['enctype'=>'multipart/form-data']
+	    //'enableClientValidation' => true,
+	    //'enableAjaxValidation' => false, 
+	]);?>
     <?=$form->field($model, 'proceso_id')->dropDownList(
         ArrayHelper::map($procesos,'id','pr_nombre'),
         ['prompt'=>'Seleccione Tipo...','onChange'=>"prueba()"]); 
@@ -26,11 +32,12 @@ use yii\helpers\ArrayHelper;
     	</div>
     </div>
     <?= $form->field($model, 'do_descripcion')->textarea(['rows' => 3]) ?>
+   
     <div class="campos">
     	
     </div>
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Crear' : 'Actualizar', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
@@ -45,8 +52,11 @@ function prueba () {
        data: {idproceso: $("#documento-proceso_id").val()},
        success: function (data) {
        		$(".campos").empty();
-       		$(".campos").append(data);
-       		console.log(data);              
+       		$(".campos").append(data);	
+       		if ($(".hasDatepicker")[0]){
+				$(".fecha").removeClass('hasDatepicker').datepicker();
+			}
+       		
        }
     });
 }

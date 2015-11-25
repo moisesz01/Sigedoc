@@ -90,4 +90,9 @@ class Proceso extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UsuarioProceso::className(), ['proceso_id' => 'id']);
     }
+    public function getDirectorio($id){
+
+        $proceso = Proceso::find()->where(['id'=>$id])->one();
+        return $proceso->pr_directorio;
+    }
 }

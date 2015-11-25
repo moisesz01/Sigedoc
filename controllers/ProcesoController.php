@@ -198,6 +198,11 @@ class ProcesoController extends Controller
                         }
                         foreach ($modelsCampo as $modelCampo) {
                             $modelCampo->proceso_id = $modelProceso->id;
+                            $campo = Opcion::find()->where(['tipo_id'=>$modelCampo->tipo_id])->one();
+                            if($campo)
+                                $modelCampo->ca_multiopc='s';
+                            else
+                                $modelCampo->ca_multiopc='n';
                             if (! ($flag = $modelCampo->save(false))) {
                                 $transaction->rollBack();
                                 break;
