@@ -1,6 +1,9 @@
 <?php
 use yii\helpers\Html;
 use app\models\User;
+use app\models\BuzonDocumento;
+use app\models\Documento;
+use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -19,19 +22,50 @@ use app\models\User;
         <div class="navbar-custom-menu">
 
             <ul class="nav navbar-nav">
-
+                <?php if (!Yii::$app->user->isGuest) : ?>
                 <!-- Messages: style can be found in dropdown.less-->
+                 <?php
+                        $userID = Yii::$app->user->id;
+                        $numDocumentos = BuzonDocumento::find()->where(['bd_estado'=>'a','bd_userdestino'=>$userID])->count();
+                ?>
                 <li class="dropdown messages-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-envelope-o"></i>
-                        <span class="label label-success">4</span>
+                        <span class="label label-success"><?=$numDocumentos?></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">You have 4 messages</li>
+                   
+                        <li class="header">Tienes <?=$numDocumentos?> documento por Procesar</li>
                         <li>
                             <!-- inner menu: contains the actual data -->
                             <ul class="menu">
+
+                                <?php 
+                                    $BuzonDocumento = BuzonDocumento::find()->where(['bd_estado'=>'a','bd_userdestino'=>$userID])->all();
+                                    foreach ($BuzonDocumento as $buzon):  
+                                        
+                                        $documento = Documento::find()->where(['iddocumento'=>$buzon->documento_iddocumento])->one();                             
+                                    
+                                ?>
+                                
                                 <li><!-- start message -->
+                                
+                                    
+                                    <a href="<?= Url::toRoute(['documento/procesar','id'=>$documento->iddocumento]); ?>">
+                                    
+                                    
+                                        
+                                        <h4 style="margin: 0 0 0 5px;">
+                                            <?= $documento->do_referencia; ?>
+                                            <small><i class="fa fa-clock-o"></i><?= $buzon->bd_fechaentrada; ?></small>
+                                        </h4>
+                                        <p style="margin: 0 0 0 5px;"><?= $documento->do_descripcion; ?></p>
+                                    </a>       
+
+                                </li>
+                                <!-- end message -->
+                                <?php endforeach;?>
+                                <!-- <li>
                                     <a href="#">
                                         <div class="pull-left">
                                             <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
@@ -44,64 +78,15 @@ use app\models\User;
                                         <p>Why not buy a new awesome theme?</p>
                                     </a>
                                 </li>
-                                <!-- end message -->
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user3-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            AdminLTE Design Team
-                                            <small><i class="fa fa-clock-o"></i> 2 hours</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user4-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Developers
-                                            <small><i class="fa fa-clock-o"></i> Today</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user3-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Sales Department
-                                            <small><i class="fa fa-clock-o"></i> Yesterday</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user4-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Reviewers
-                                            <small><i class="fa fa-clock-o"></i> 2 days</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
+                               -->
+                            
+                                
                             </ul>
                         </li>
-                        <li class="footer"><a href="#">See All Messages</a></li>
+                        <li class="footer"><a href="#">Ir al buzón de Documentos</a></li>
                     </ul>
                 </li>
+            <?php endif; ?>
                 <li class="dropdown notifications-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-bell-o"></i>

@@ -19,7 +19,7 @@ $fieldOptions2 = [
 ];
 ?>
 
-<div class="login-box">
+    <div class="login-box">
     <div class="login-logo">
         <a href="#"><b>Sigedoc</b>Software</a>
     </div>
@@ -59,3 +59,4 @@ $fieldOptions2 = [
     </div>
     <!-- /.login-box-body -->
 </div><!-- /.login-box -->
+   

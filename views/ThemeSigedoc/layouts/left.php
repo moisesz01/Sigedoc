@@ -90,6 +90,17 @@
                            
                         ],
                     ],
+                    [
+                        'label' => 'Flujo del Documento',
+                        'icon' => 'fa fa-share',
+                        'url' => '#',
+                        'visible' => (Yii::$app->user->can('Administrar Documento')),
+                        'items' => [
+                            ['label' => 'Administrar Flujo', 'icon' => 'fa fa-file-code-o', 'url' => ['/documento/flujodocumento']],
+                            
+                           
+                        ],
+                    ],
                 ],
             ]
         ) ?>

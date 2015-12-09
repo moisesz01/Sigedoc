@@ -45,7 +45,7 @@ class Observacion extends \yii\db\ActiveRecord
         return [
             'idobservacion' => 'Idobservacion',
             'buzondocumento_idbuzondocumento' => 'Buzondocumento Idbuzondocumento',
-            'ob_observacion' => 'Ob Observacion',
+            'ob_observacion' => 'Observación',
             'ob_fecha' => 'Ob Fecha',
         ];
     }
