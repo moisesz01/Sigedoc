@@ -23,6 +23,9 @@ use yii\filters\VerbFilter;
 use yii\db\Query;
 use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\data\Pagination;
 
 /**
  * DocumentoController implements the CRUD actions for Documento model.
@@ -94,7 +97,7 @@ class DocumentoController extends Controller
     public function actionDescargar($id){
 
         $file = DocumentoDigital::find()->where(['iddocumentodigital'=>$id])->one();
-        $file = \Yii::getAlias('@webroot').$file->dd_ruta;
+        $file = \Yii::getAlias('@webroot').$file->dd_url;
         if (file_exists($file)) {
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
@@ -108,6 +111,9 @@ class DocumentoController extends Controller
             flush();
             readfile($file);
             exit;
+        }
+        else{
+
         }
 
     }
@@ -237,7 +243,8 @@ class DocumentoController extends Controller
                         $docDigital->requerimiento_id = $recaudos_id[$key];
                         $docDigital->documento_flujo_iddocumento_actividad = $docFlujo->iddocumento_actividad;
                         $docDigital->dd_nombre = $nombre;
-                        $docDigital->dd_ruta = '/'.$ruta.'/'.$nombre;
+                        $docDigital->dd_ruta = '/'.$ruta;
+                        $docDigital->dd_url = '/'.$ruta.'/'.$nombre;
                         $docDigital->dd_tipo = $type;
                         $docDigital->save();
                     }
@@ -394,7 +401,8 @@ class DocumentoController extends Controller
                     return $this->goHome();
 
                 }else{
-
+                    $docFlujo->do_estado = 'f';
+                    $docFlujo->save();
                     Yii::$app->session->setFlash('success','El Documento ha sido procesado con éxito y culminado su flujo de trabajo');
                     return $this->goHome();
                 }
@@ -430,7 +438,15 @@ class DocumentoController extends Controller
         $query->select([
             
             'campo.ca_nombre AS campo',
-            'respuesta.re_respuesta AS respuesta'
+            'campo.id',
+            'campo.ca_nombre',
+            'campo.ca_obligatorio',
+            'campo.ca_multiopc',
+            'campo.tipo_id',
+            'campo.proceso_id',
+            'respuesta.re_respuesta AS respuesta',
+            'respuesta.idrespuesta AS idrespuesta'
+            
         ])
         ->from('campo')
         ->join('JOIN','respuesta','respuesta.campo_id=campo.id')
@@ -438,9 +454,119 @@ class DocumentoController extends Controller
         $command = $query->createCommand();
         $campos = $command->queryAll();
 
+        $query = new Query;
+        $query->select([
+            'buzondocumento.bd_userdestino AS usuario',
+            'observacion.ob_observacion As observacion',
+        ])
+        ->from('buzondocumento')
+        ->join('JOIN','observacion','observacion.buzondocumento_idbuzondocumento=buzondocumento.idbuzondocumento')
+        ->where('buzondocumento.documento_iddocumento=:iddocumento',[':iddocumento'=>$id]);
+        $command = $query->createCommand();
+        $observaciones = $command->queryAll();
+        $modelObservacion = new Observacion;
 
 
         if ($model->load(Yii::$app->request->post())) {  
+
+            if (isset($_POST['idrecaudo'])) {
+                $idrecaudos = $_POST['idrecaudo'];
+                $recaudos = UploadedFile::getInstancesByName('recaudo');    
+                foreach ($recaudos as $key => $recaudo) { //se recorren los requerimientos para ir guardandolos
+                    $idrecaudo = $idrecaudos[$key];
+                    $nombre = str_replace(' ', '', strtolower($recaudo->name)); 
+                    $nombre = Yii::$app->security->generateRandomString(8).'_'.$nombre;
+                    $type = explode("/", $recaudo->type);
+                    $type = $type[1];
+                    $docDigital = Documentodigital::find()->where(['iddocumentodigital'=>$idrecaudo])->one();
+                    $ruta = $docDigital->dd_ruta;
+                    if ($recaudo->saveAs(\Yii::getAlias('@webroot').$ruta.'/'.$nombre)) {
+                        
+                        $docDigital->dd_nombre = $nombre;
+                        $docDigital->dd_url = $ruta.'/'.$nombre;
+                        $docDigital->dd_tipo = $type;
+                        $docDigital->save();
+
+                    }
+                    
+                }
+
+            }
+            
+            $Buzon = buzondocumento::find()->where(['bd_estado'=>'a','documento_iddocumento'=>$id])->one();
+            $Buzon->bd_fechasalida = $this->getFecha();
+            $Buzon->bd_estado = 'p';
+            $Buzon->save();
+            $modelObservacion->ob_observacion = $_POST['Observacion']['ob_observacion'];
+            $modelObservacion->buzondocumento_idbuzondocumento = $Buzon->idbuzondocumento;
+            $modelObservacion->save();
+            
+
+            $docFlujo = DocumentoFlujo::find()->where(['do_estado'=>'a','documento_iddocumento'=>$id])->one();
+            $docFlujo->do_fecha_fin = $this->getFecha();            
+            $docFlujo->do_estado = 'p';
+            $docFlujo->save();
+
+            $idProcesoFlujo = $docFlujo->proceso_flujo_id;
+            $ProcesoFlujo = ProcesoFlujo::find()->where(['id'=>$idProcesoFlujo])->one();
+            $orden = $ProcesoFlujo->pf_orden;
+            $ProcesoFlujoNext = ProcesoFlujo::find()->where(['pf_orden' => $orden+1,'proceso_id' => $ProcesoFlujo->proceso_id])->one();
+
+            if($ProcesoFlujoNext){
+
+                $NewDocFlujo = new DocumentoFlujo;
+                $NewDocFlujo->proceso_flujo_id = $ProcesoFlujoNext->id;
+                $NewDocFlujo->do_fechaini = $this->getFecha();
+                $NewDocFlujo->usuario_idusuario = $ProcesoFlujoNext->usuario_idusuario;
+                $NewDocFlujo->documento_iddocumento = $id;
+                $NewDocFlujo->do_estado = 'a';
+                $NewDocFlujo->save();
+
+                $Buzon = new buzondocumento;
+                $Buzon->bd_fechaentrada = $this->getFecha();
+                $Buzon->bd_estado = 'a';
+                $Buzon->bd_userorigen = $this->getUserConnect();
+                $Buzon->bd_userdestino = $ProcesoFlujoNext->usuario_idusuario;
+                $Buzon->documento_iddocumento = $id;
+                $Buzon->save();
+                
+            }
+
+            $respuesta = $_POST['DOCUMENTO']['field']; 
+            $pregunta_id = $_POST['DOCUMENTO']['field_id'];
+            $respuesta_id = $_POST['DOCUMENTO']['field_resp'];
+
+            for ($i=0; $i < count($respuesta) ; $i++) { //se recorre todas las respuestas
+
+                if($respuesta[$i]!=""){ //si los campos eran obligatorios el campo será diferente de vacio
+                    
+                    $modelCampo = Campo::find()->where(['id'=>$pregunta_id[$i]])->one();
+
+                    if($modelCampo->ca_multiopc=='s'){//en caso de que el campo tenga opciones se busca su id para obtener el valor de la opcion
+                        
+                        $opcion = Opcion::find()->where(['id'=>$respuesta[$i]])->one();
+                        $modelRespuesta = Respuesta::find()->where(['idrespuesta'=>$respuesta_id[$i]])->one();
+                        $modelRespuesta->re_respuesta = $opcion->op_nombre;
+                        $modelRespuesta->save();
+
+                    }else{ //sino es un campo con opciones se carga el valor introducido en el campo
+
+                        $modelRespuesta = Respuesta::find()->where(['idrespuesta'=>$respuesta_id[$i]])->one();
+                        $modelRespuesta->re_respuesta = $respuesta[$i];
+                        $modelRespuesta->save();
+
+                    }
+                }
+                else //si el campo no es obligatorio se guarda el caracter "."
+                {
+                    $modelRespuesta = Respuesta::find()->where(['idrespuesta'=>$respuesta_id[$i]])->one();
+                    $modelRespuesta->re_respuesta = '.';
+                    $modelRespuesta->save();
+                }  
+            
+            }
+            $model->save();
+            
             Yii::$app->session->setFlash('success','El Documento ha sido procesado con éxito.');
             return $this->goHome();
         }
@@ -449,23 +575,15 @@ class DocumentoController extends Controller
             'model'=>$model,
             'recaudos'=>$recaudos,
             'campos'=>$campos,
+            'observaciones'=>$observaciones,
+            'modelObservacion'=>$modelObservacion,
             
         ]);
-
-
-        
-
-
-
-        
-
 
 
 
     }
     public function actionFlujodocumento(){
-
-
 
         $searchModel = new DocumentoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -475,20 +593,78 @@ class DocumentoController extends Controller
             'dataProvider' => $dataProvider,
         ]);
 
-        
-
-
     }
-
+    public function actionBuzon(){
+        $userID = $this->getUserConnect();
+        $BuzonDocumento = BuzonDocumento::find()->where(['bd_estado'=>'a','bd_userdestino'=>$userID]);
+        $count = clone $BuzonDocumento;
+        $pagination = new Pagination([
+            'pagesize'=>10,
+            'totalCount'=>$count->count(),
+        ]);
+        $buzon = $BuzonDocumento
+                ->offset($pagination->offset)
+                ->limit($pagination->limit)
+                ->all();
+     
+        return $this->render('buzon', [
+            'BuzonDocumento'=>$buzon,
+            'pagination'=>$pagination,
+        ]);
+    }
     public function actionFlujo($id){
 
-        
-        $DocumentoFlujo = DocumentoFlujo::find()->where(['documento_iddocumento'=>$id])->all();
+        $query = new query();
+        $query->select([
+            'flujo.fl_nombre AS flujo',
+            'proceso.pr_nombre AS proceso',
+            'actividad.ac_nombre AS actividad',
+            'user.username AS usuario',
+            'documento_flujo.do_fechaini AS fechaini',
+            'documento_flujo.do_fecha_fin AS fechafin'
+        ])
+        ->from('documento_flujo')
+        ->join('JOIN','proceso_flujo','documento_flujo.proceso_flujo_id=proceso_flujo.id')
+        ->join('JOIN','proceso','proceso_flujo.proceso_id=proceso.id')
+        ->join('JOIN','flujo','proceso_flujo.flujo_idflujo=flujo.idflujo')
+        ->join('JOIN','actividad','proceso_flujo.actividad_idactividad=actividad.idactividad')
+        ->join('JOIN','user','proceso_flujo.usuario_idusuario="user".id')
+        ->where('documento_iddocumento=:id',[':id'=>$id]);
+        $command = $query->createCommand();
+        $DocumentoFlujo = $command->queryAll(); 
+        $Flujo = DocumentoFlujo::find()->where(['documento_iddocumento'=>$id])->orderBy([
+               'iddocumento_actividad'=>SORT_DESC,    
+        ])->one();
+        $proceso = Documento::find()->where(['iddocumento'=>$id])->one(); 
+        $query = new query();
+        $query->select([
+            'flujo.fl_nombre AS flujo',
+            'proceso.pr_nombre AS proceso',
+            'actividad.ac_nombre AS actividad',
+            'user.username AS usuario',
+            'proceso_flujo.pf_orden AS orden',
+            'proceso_flujo.id AS id'
+        ])
+        ->from('proceso_flujo')
+        ->join('JOIN','proceso','proceso_flujo.proceso_id=proceso.id')
+        ->join('JOIN','flujo','proceso_flujo.flujo_idflujo=flujo.idflujo')
+        ->join('JOIN','actividad','proceso_flujo.actividad_idactividad=actividad.idactividad')
+        ->join('JOIN','user','proceso_flujo.usuario_idusuario="user".id')
+        ->where('proceso_flujo.proceso_id=:id',[':id'=>$proceso->proceso_id])
+        ->addOrderBy(['proceso_flujo.pf_orden'=>SORT_ASC]);
+
+        $command = $query->createCommand();
+        $transitar = $command->queryAll(); 
+       
+
         return $this->render('flujoview',[
             'DocumentoFlujo'=>$DocumentoFlujo,
             'model' => $this->findModel($id),
+            'transitar'=>$transitar,
+            'flujo'=>$Flujo,
         ]);
     }
+
     public function actionGetcampos(){
         if (Yii::$app->request->isAjax) {
             $data = Yii::$app->request->post();

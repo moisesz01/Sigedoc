@@ -84,11 +84,11 @@
 					    
 					    'language' => 'es',
 					    'dateFormat' => 'yyyy-MM-dd',
+					    
 					    'options'=>[
 					    	'class'=>'form-control fecha',
 					    	'required' => true,
-					    	'changeMonth' => true,
-      						'changeYear' => true,
+					    	
 					    ],
 					]);
 
@@ -98,10 +98,6 @@
 					    'name'  => 'DOCUMENTO[field][]',					    
 					    'language' => 'es',
 					    'dateFormat' => 'yyyy-MM-dd',
-					    'changeYear' => true,
-					    'clientOptions' => [
-						    	'changeYear' => true,
-							],
 						'options'=>[
 					    	'class'=>'form-control fecha',
 					    	
@@ -139,7 +135,7 @@
 	$command = $query->createCommand();
 	$requerimientos = $command->queryAll();
 	
-	echo $this->renderAjax('_requerimientos',['requerimientos'=>$requerimientos]);
+	echo $this->render('_requerimientos',['requerimientos'=>$requerimientos]);
 ?>
 
 

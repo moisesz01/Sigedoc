@@ -54,8 +54,10 @@ function prueba () {
        		$(".campos").empty();
        		$(".campos").append(data);	
        		if ($(".hasDatepicker")[0]){
-				$(".fecha").removeClass('hasDatepicker').datepicker();
-			}
+            
+    				$(".fecha").removeClass('hasDatepicker').datepicker({"changeYear":true,"changeMonth":true,"yearRange":"1900:2099","dateFormat":"yy-mm-dd"});
+
+    			}
        		
        }
     });

@@ -23,8 +23,11 @@ $this->params['breadcrumbs'][] = 'Flujo de Documentos';
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'do_referencia',
-            'proceso_id',
+            'do_referencia',            
+            [
+                'attribute'=>'proceso_id',
+                'value'=>'proceso.pr_nombre'
+            ],
             'do_nombre',
             'do_descripcion:ntext',
 

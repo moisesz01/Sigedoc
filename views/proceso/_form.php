@@ -12,7 +12,7 @@ use yii\helpers\Json;
     <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
     <div class="row">
         <div class="col-sm-4">
-            <?= $form->field($modelProceso, 'pr_referencia')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($modelProceso, 'id')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-sm-4">
             <?= $form->field($modelProceso, 'pr_nombre')->textInput(['maxlength' => true]) ?>

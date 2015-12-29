@@ -18,8 +18,8 @@ class DocumentoSearch extends Documento
     public function rules()
     {
         return [
-            [['iddocumento', 'proceso_id'], 'integer'],
-            [['do_referencia', 'do_nombre', 'do_descripcion'], 'safe'],
+            [['iddocumento'], 'integer'],
+            [['do_referencia', 'do_nombre', 'do_descripcion','proceso_id'], 'safe'],
         ];
     }
 
@@ -57,11 +57,12 @@ class DocumentoSearch extends Documento
 
         $query->andFilterWhere([
             'iddocumento' => $this->iddocumento,
-            'proceso_id' => $this->proceso_id,
         ]);
+        $query->joinWith('proceso');
 
         $query->andFilterWhere(['like', 'do_referencia', $this->do_referencia])
             ->andFilterWhere(['like', 'do_nombre', $this->do_nombre])
+            ->andFilterWhere(['like','proceso.pr_nombre',$this->proceso_id])
             ->andFilterWhere(['like', 'do_descripcion', $this->do_descripcion]);
 
         return $dataProvider;

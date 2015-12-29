@@ -2,7 +2,9 @@
 use yii\helpers\Html;
 use app\models\User;
 use app\models\BuzonDocumento;
+use app\models\DocumentoFlujo;
 use app\models\Documento;
+use app\models\ProcesoFlujo;
 use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
@@ -50,17 +52,34 @@ use yii\helpers\Url;
                                 
                                 <li><!-- start message -->
                                 
-                                    
-                                    <a href="<?= Url::toRoute(['documento/procesar','id'=>$documento->iddocumento]); ?>">
-                                    
-                                    
-                                        
+                                    <?php
+                                        $docFlujo = DocumentoFlujo::find()->where(['do_estado'=>'a','documento_iddocumento'=>$documento->iddocumento])->one();
+                                        $idProcesoFlujo = $docFlujo->proceso_flujo_id;
+                                        $ProcesoFlujo = ProcesoFlujo::find()->where(['id'=>$idProcesoFlujo])->one();
+                                        $orden = $ProcesoFlujo->pf_orden;
+                                        if($orden==0):
+                                    ?>
+                                    <a href="<?= Url::toRoute(['documento/actualizar','id'=>$documento->iddocumento]); ?>">    
                                         <h4 style="margin: 0 0 0 5px;">
                                             <?= $documento->do_referencia; ?>
                                             <small><i class="fa fa-clock-o"></i><?= $buzon->bd_fechaentrada; ?></small>
                                         </h4>
                                         <p style="margin: 0 0 0 5px;"><?= $documento->do_descripcion; ?></p>
-                                    </a>       
+                                    </a>
+                                    <?php
+                                        else:
+                                    ?>
+                                    <a href="<?= Url::toRoute(['documento/procesar','id'=>$documento->iddocumento]); ?>">    
+                                        <h4 style="margin: 0 0 0 5px;">
+                                            <?= $documento->do_referencia; ?>
+                                            <small><i class="fa fa-clock-o"></i><?= $buzon->bd_fechaentrada; ?></small>
+                                        </h4>
+                                        <p style="margin: 0 0 0 5px;"><?= $documento->do_descripcion; ?></p>
+                                    </a> 
+                                    <?php
+                                        endif;
+                                    ?>
+                                       
 
                                 </li>
                                 <!-- end message -->
@@ -83,7 +102,7 @@ use yii\helpers\Url;
                                 
                             </ul>
                         </li>
-                        <li class="footer"><a href="#">Ir al buzón de Documentos</a></li>
+                        <li class="footer"><a href="<?= Url::toRoute(['documento/buzon']); ?>">Ir al buzón de Documentos</a></li>
                     </ul>
                 </li>
             <?php endif; ?>
