@@ -45,7 +45,7 @@
 
     </div>
     <div class="form-group">
-        <?= Html::submitButton('Crear', ['class' =>'btn btn-success']) ?>
+        <?= Html::submitButton('Aceptar', ['class' =>'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

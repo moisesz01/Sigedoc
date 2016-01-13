@@ -29,4 +29,7 @@ class ReportesController extends Controller
             'modelProductividad'=>$modelProductividad,
         ]);
     }
+    
+
+
 }
